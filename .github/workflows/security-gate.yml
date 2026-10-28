@@ -1,0 +1,64 @@
+name: Terraform Security Policy Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-gate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  terraform:
+    name: Terraform format and validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+      - name: Check formatting
+        run: terraform -chdir=infra fmt -check -recursive
+      - name: Initialize providers without backend
+        run: terraform -chdir=infra init -backend=false
+      - name: Validate configuration
+        run: terraform -chdir=infra validate
+
+  checkov:
+    name: Checkov IaC scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Checkov
+        run: python -m pip install --disable-pip-version-check checkov
+      - name: Scan Terraform
+        run: checkov -d infra --config-file .checkov.yaml
+
+  policy-tests:
+    name: OPA / Conftest policy tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Conftest
+        env:
+          CONFTEST_VERSION: "0.56.0"
+        run: |
+          curl -sSL "https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}/conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz" -o /tmp/conftest.tar.gz
+          tar -xzf /tmp/conftest.tar.gz -C /tmp conftest
+          sudo install /tmp/conftest /usr/local/bin/conftest
+          conftest --version
+      - name: Test compliant and non-compliant fixtures
+        run: bash scripts/test-policies.sh
