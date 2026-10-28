@@ -1,0 +1,8 @@
+{
+  "resource_type": "azurerm_storage_account",
+  "name": "labsecurestorage",
+  "allow_nested_items_to_be_public": false,
+  "https_traffic_only_enabled": true,
+  "min_tls_version": "TLS1_2",
+  "public_network_access_enabled": false
+}
