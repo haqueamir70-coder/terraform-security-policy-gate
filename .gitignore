@@ -1,0 +1,30 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfplan
+plan.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Local tooling
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+.vscode/
+.idea/
+
+# Secrets and environment files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
