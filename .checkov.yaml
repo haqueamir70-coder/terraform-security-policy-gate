@@ -1,0 +1,8 @@
+# Narrow exceptions for this educational lab; review before production use.
+framework:
+  - terraform
+skip-check:
+  # Private endpoint / DNS design is documented as a production-hardening follow-up.
+  - CKV_AZURE_35
+  # Customer-managed keys require a key lifecycle and access design not implemented here.
+  - CKV_AZURE_42
