@@ -2,7 +2,7 @@
 
 ### Shift-left security for Azure Infrastructure as Code
 
-[![Terraform](https://img.shields.io/badge/Terraform-IaC-844FBA?logo=terraform&logoColor=white)](https://www.terraform.io/) [![Azure](https://img.shields.io/badge/Cloud-Azure-0078D4?logo=microsoftazure&logoColor=white)](https://azure.microsoft.com/) [![GitHub Actions](https://img.shields.io/badge/CI-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/features/actions) [![Checkov](https://img.shields.io/badge/Security-Checkov-212121)](https://www.checkov.io/) [![OPA](https://img.shields.io/badge/Policy-OPA%2FRego-7D9199)](https://www.openpolicyagent.org/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Security Gate CI](https://github.com/haqueamir70-coder/terraform-security-policy-gate/actions/workflows/security-gate.yml/badge.svg?branch=main)](https://github.com/haqueamir70-coder/terraform-security-policy-gate/actions/workflows/security-gate.yml) [![Terraform](https://img.shields.io/badge/Terraform-IaC-844FBA?logo=terraform&logoColor=white)](https://www.terraform.io/) [![Azure](https://img.shields.io/badge/Cloud-Azure-0078D4?logo=microsoftazure&logoColor=white)](https://azure.microsoft.com/) [![GitHub Actions](https://img.shields.io/badge/CI-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/features/actions) [![Checkov](https://img.shields.io/badge/Security-Checkov-212121)](https://www.checkov.io/) [![OPA](https://img.shields.io/badge/Policy-OPA%2FRego-7D9199)](https://www.openpolicyagent.org/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **A hands-on DevSecOps lab that checks Azure Terraform configuration against security controls before infrastructure changes proceed.**
 
@@ -123,7 +123,7 @@ Install Conftest, then run:
 bash scripts/test-policies.sh
 ```
 
-The script expects the compliant fixture to pass and the non-compliant fixture to be rejected. If the insecure fixture unexpectedly passes, the script exits unsuccessfully.
+The script runs both a positive and a negative test: the compliant fixture must pass, while the deliberately insecure storage-account fixture must be rejected. If the insecure fixture unexpectedly passes, the script exits with a non-zero status, causing the CI job to fail. This verifies that the policy gate can detect the sample violations; it does not intentionally make the Terraform deployment configuration insecure.
 
 ## CI pipeline
 
