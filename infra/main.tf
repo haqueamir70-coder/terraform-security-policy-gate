@@ -29,9 +29,9 @@ resource "azurerm_storage_account" "secure" {
   resource_group_name           = azurerm_resource_group.security_lab.name
   location                      = azurerm_resource_group.security_lab.location
   account_tier                  = "Standard"
-  account_replication_type      = "ZRS"
+  account_replication_type       = "ZRS"
   min_tls_version               = "TLS1_2"
-  https_traffic_only_enabled    = true
+  https_traffic_only_enabled     = true
   allow_nested_items_to_be_public = false
   shared_access_key_enabled     = false
   public_network_access_enabled = false
