@@ -167,3 +167,8 @@ MIT. See [LICENSE](LICENSE).
 ---
 
 Built as a practical learning reference for Azure, Terraform, DevSecOps, and Policy as Code.
+
+
+## Architecture and interview preparation
+
+See the [architecture diagram and interview questions](docs/README.md) for the repository-specific design walkthrough and technical interview guide.
