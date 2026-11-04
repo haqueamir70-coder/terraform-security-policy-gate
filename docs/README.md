@@ -75,3 +75,7 @@ Use local Terraform plan fixtures and policy tests, static validation and CI run
 ### 10. Answer
 
 A pass does not prove runtime configuration, identity, network paths, service behavior or drift. Validate deployed resources and monitor continuously.
+
+## Complete zero-to-hero guide
+
+See [ZERO-TO-HERO.md](./ZERO-TO-HERO.md) for the business scenario, architecture walkthrough, tool-by-tool explanations, implementation sequence, practical commands, troubleshooting playbook and additional scenario-based interview questions with answers.
