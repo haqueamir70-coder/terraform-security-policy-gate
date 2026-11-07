@@ -1,3 +1,15 @@
+<div align="center">
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:111827,50:7C3AED,100:38BDF8&height=190&section=header&text=Terraform+Security+Policy+Gate&fontSize=32&fontColor=ffffff&animation=fadeIn" alt="Terraform Security Policy Gate project banner" width="100%" />
+
+<img src="https://readme-typing-svg.demolab.com/?font=Inter&weight=600&size=16&pause=1600&color=38BDF8&center=true&vCenter=true&width=900&height=36&lines=Terraform+Security+Policy+Gate+%E2%80%A2+Architecture+%E2%80%A2+Automation+%E2%80%A2+Security" alt="Animated project focus line" />
+
+![Terraform](https://img.shields.io/badge/Infrastructure+as+Code-844FBA?style=for-the-badge&logo=terraform&logoColor=white) ![Policy](https://img.shields.io/badge/OPA+%2F+Rego-7D9199?style=for-the-badge) ![Security](https://img.shields.io/badge/Shift+Left-2563EB?style=for-the-badge)
+
+</div>
+
+---
+
 # 🛡️ Terraform Security Policy Gate
 
 ### Shift-left security for Azure Infrastructure as Code
