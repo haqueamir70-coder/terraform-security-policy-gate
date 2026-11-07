@@ -1,113 +1,72 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:111827,50:7C3AED,100:38BDF8&height=190&section=header&text=Terraform+Security+Policy+Gate&fontSize=32&fontColor=ffffff&animation=fadeIn" alt="Terraform Security Policy Gate project banner" width="100%" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:111827,45:6D28D9,100:38BDF8&height=220&section=header&text=Terraform%20Policy%20Gate&fontSize=36&fontColor=ffffff&animation=fadeIn" width="100%" alt="Terraform Security Policy Gate"/>
 
-<img src="https://readme-typing-svg.demolab.com/?font=Inter&weight=600&size=16&pause=1600&color=38BDF8&center=true&vCenter=true&width=900&height=36&lines=Terraform+Security+Policy+Gate+%E2%80%A2+Architecture+%E2%80%A2+Automation+%E2%80%A2+Security" alt="Animated project focus line" />
+### Catch misconfiguration early · Enforce policy as code · Fail safely
 
-![Terraform](https://img.shields.io/badge/Infrastructure+as+Code-844FBA?style=for-the-badge&logo=terraform&logoColor=white) ![Policy](https://img.shields.io/badge/OPA+%2F+Rego-7D9199?style=for-the-badge) ![Security](https://img.shields.io/badge/Shift+Left-2563EB?style=for-the-badge)
+[![CI](https://github.com/haqueamir70-coder/terraform-security-policy-gate/actions/workflows/security-gate.yml/badge.svg?branch=main)](https://github.com/haqueamir70-coder/terraform-security-policy-gate/actions/workflows/security-gate.yml)
+[![Terraform](https://img.shields.io/badge/Terraform-844FBA?style=for-the-badge&logo=terraform&logoColor=white)](https://developer.hashicorp.com/terraform)
+[![Checkov](https://img.shields.io/badge/Scanner-Checkov-111827?style=for-the-badge)](https://www.checkov.io/)
+[![OPA](https://img.shields.io/badge/Policy-OPA%20%2F%20Rego-7D9199?style=for-the-badge)](https://www.openpolicyagent.org/)
+[![Conftest](https://img.shields.io/badge/Tests-Conftest-2563EB?style=for-the-badge)](https://www.conftest.dev/)
+
+**A credential-free DevSecOps lab that combines Terraform validation, Checkov static analysis and custom OPA/Conftest policy tests to prevent selected insecure Azure Storage configurations from passing CI.**
+
+[Architecture](#-policy-gate-architecture) · [Quick start](#-run-the-gate-locally) · [Policy controls](#-policy-controls) · [CI](#-ci-enforcement-model)
 
 </div>
 
----
+## The risk
 
-# 🛡️ Terraform Security Policy Gate
+Terraform can be syntactically valid while describing infrastructure with excessive exposure or weak transport settings. This project adds a policy gate before any cloud deployment stage: broad scanner coverage plus explicit organization-specific rules and positive/negative fixtures.
 
-### Shift-left security for Azure Infrastructure as Code
-
-[![Security Gate CI](https://github.com/haqueamir70-coder/terraform-security-policy-gate/actions/workflows/security-gate.yml/badge.svg?branch=main)](https://github.com/haqueamir70-coder/terraform-security-policy-gate/actions/workflows/security-gate.yml) [![Terraform](https://img.shields.io/badge/Terraform-IaC-844FBA?logo=terraform&logoColor=white)](https://www.terraform.io/) [![Azure](https://img.shields.io/badge/Cloud-Azure-0078D4?logo=microsoftazure&logoColor=white)](https://azure.microsoft.com/) [![GitHub Actions](https://img.shields.io/badge/CI-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/features/actions) [![Checkov](https://img.shields.io/badge/Security-Checkov-212121)](https://www.checkov.io/) [![OPA](https://img.shields.io/badge/Policy-OPA%2FRego-7D9199)](https://www.openpolicyagent.org/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-
-**A hands-on DevSecOps lab that checks Azure Terraform configuration against security controls before infrastructure changes proceed.**
-
-[Architecture](#architecture) · [Quick Start](#quick-start) · [Policy Controls](#policy-controls) · [CI Pipeline](#ci-pipeline) · [Interview Prep](#interview-ready)
-
----
-
-## The problem
-
-Terraform can be syntactically valid and still describe insecure infrastructure. This lab demonstrates a preventive policy gate that combines Terraform validation, Checkov static analysis, and custom OPA/Conftest rules.
-
-## What this demonstrates
-
-- Shift-left security checks in pull requests
-- Policy as Code using Rego
-- Layered assurance with Checkov and OPA/Conftest
-- Positive and negative policy test fixtures
-- GitHub Actions CI with least-privilege repository permissions
-- Reviewable security decisions in version control
-
-## Architecture
+## Policy gate architecture
 
 ```mermaid
-flowchart TD
-  A[Push or pull request] --> B[Terraform fmt and validate]
-  B --> C[Checkov IaC scan]
-  C --> D[OPA / Conftest policy tests]
-  D --> E{Checks pass?}
-  E -->|Yes| F[Eligible for review / next stage]
-  E -->|No| G[Fail CI and report findings]
-  F --> H[Human approval and separate deployment controls]
+flowchart LR
+  PR[Pull request] --> Fmt[Terraform fmt]
+  Fmt --> Init[Backend-free init + validate]
+  Init --> Checkov[Checkov IaC scan]
+  Checkov --> Conftest[OPA / Rego policy tests]
+  Conftest --> Decision{Policy tests pass?}
+  Decision -->|Yes| Review[Eligible for human review]
+  Decision -->|No| Fail[Fail CI with findings]
+  Review -. separate authorization .-> Deploy[Future deployment stage]
 ```
 
-**Important:** this workflow does not deploy resources. A passing pipeline means only that configured checks passed for the inputs evaluated; it is not a guarantee of total security or regulatory compliance.
-
-## Technology stack
-
-| Component | Purpose |
-|---|---|
-| Terraform + AzureRM | Declare Azure infrastructure |
-| Checkov | Detect common IaC misconfigurations |
-| OPA / Rego | Define organization-specific policy |
-| Conftest | Test structured input against policy |
-| GitHub Actions | Automate repeatable CI checks |
-
-## Repository layout
-
-```text
-.
-├── .github/workflows/security-gate.yml
-├── infra/
-│   ├── main.tf
-│   ├── variables.tf
-│   └── outputs.tf
-├── policy/terraform.rego
-├── policy-tests/
-│   ├── compliant.json
-│   └── noncompliant.json
-├── scripts/test-policies.sh
-├── .checkov.yaml
-├── .gitignore
-├── CONTRIBUTING.md
-├── LICENSE
-├── SECURITY.md
-└── README.md
-```
+The workflow is designed to run without Azure credentials and does not deploy resources.
 
 ## Policy controls
 
-The sample Rego rules explicitly test that the storage-account input disables public nested-item access, enforces HTTPS-only traffic, requires TLS 1.2, and disables public network access. The fixtures test both a compliant example and a deliberately insecure example.
-
-| Control | Expected setting | Reason |
+| Control | Required condition | Risk reduced |
 |---|---|---|
-| Public nested-item access | Disabled | Prevent anonymous exposure |
-| HTTPS-only traffic | Enabled | Protect data in transit |
-| Minimum TLS | TLS 1.2 | Avoid obsolete transport security |
-| Public network access | Disabled in this lab | Reduce reachable attack surface |
+| Public nested-item access | Disabled | Accidental anonymous exposure |
+| HTTPS-only | Enabled | Insecure transport |
+| Minimum TLS | TLS 1.2 | Legacy protocol use |
+| Public network access | Disabled for this lab policy | Unnecessary public reachability |
 
-The Terraform resource is a learning example. Network design, private endpoints/DNS, identity, diagnostics, encryption/key lifecycle, and environment-specific requirements must be designed and validated separately before production use.
+Checkov and OPA serve different purposes: Checkov provides a broad set of predefined IaC checks, while Rego expresses project- or organization-specific rules. Neither replaces threat modelling, architecture review or runtime monitoring.
 
-## Quick start
+## Positive and negative testing
+
+The policy fixtures include:
+- A **compliant** input expected to pass.
+- A deliberately **non-compliant** input expected to be rejected.
+
+The negative test matters: it demonstrates that the gate can detect a known violation, rather than merely proving that a happy-path file passes.
+
+## Run the gate locally
 
 ### Prerequisites
 
-- Git
-- Terraform CLI 1.5 or later
-- Python 3 and pip for Checkov
-- Conftest CLI
-- Azure CLI/subscription only if you later choose to deploy the lab
+- Terraform CLI 1.5+.
+- Python 3 and pip for Checkov.
+- Conftest CLI.
+- Git.
 
-No Azure credentials are needed to run the JSON policy fixtures. Never commit credentials, Terraform state, real secrets, or plan artifacts.
+No Azure subscription or credentials are required for the JSON policy fixtures.
 
-### Validate Terraform
+### Terraform checks
 
 ```bash
 terraform -chdir=infra fmt -check -recursive
@@ -115,72 +74,68 @@ terraform -chdir=infra init -backend=false
 terraform -chdir=infra validate
 ```
 
-### Run Checkov
-
-Use a virtual environment if possible:
+### Checkov
 
 ```bash
 python -m venv .venv
+# Linux / macOS
 source .venv/bin/activate
-# Windows PowerShell: .\\.venv\\Scripts\\Activate.ps1
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip checkov
 checkov -d infra --config-file .checkov.yaml
 ```
 
-### Run policy tests
+### OPA / Conftest policy tests
 
-Install Conftest, then run:
+After installing Conftest:
 
 ```bash
 bash scripts/test-policies.sh
 ```
 
-The script runs both a positive and a negative test: the compliant fixture must pass, while the deliberately insecure storage-account fixture must be rejected. If the insecure fixture unexpectedly passes, the script exits with a non-zero status, causing the CI job to fail. This verifies that the policy gate can detect the sample violations; it does not intentionally make the Terraform deployment configuration insecure.
+Expected behavior: the compliant fixture passes and the deliberately insecure fixture is rejected. The script returns a non-zero status if the negative test unexpectedly passes.
 
-## CI pipeline
+## CI enforcement model
 
-The workflow runs on pushes to `main`, pull requests, and manual dispatch. It contains separate jobs for Terraform format/validation, Checkov scanning, and OPA/Conftest fixture tests. The jobs do not authenticate to Azure or apply Terraform.
+Workflow: [`.github/workflows/security-gate.yml`](.github/workflows/security-gate.yml)
 
-For production, additionally pin actions to reviewed commit SHAs and tool versions, use Azure workload identity federation (OIDC), secure remote state and locking, protect the default branch, require reviews/status checks, and implement approved deployment environments.
+The workflow separates Terraform checks, Checkov scanning and OPA/Conftest fixture tests. It does not log in to Azure or run Terraform apply. Review the [Actions history](../../actions) for current results.
+
+A green workflow means the configured checks completed successfully for the files evaluated. It does not prove total security, compliance certification or safe runtime behavior.
+
+## Repository map
+
+```text
+.github/workflows/security-gate.yml
+infra/                   Terraform sample
+policy/                  Rego policy
+policy-tests/            Compliant and non-compliant fixtures
+scripts/test-policies.sh Local policy test runner
+.checkov.yaml            Scanner configuration
+CONTRIBUTING.md
+SECURITY.md
+LICENSE
+```
 
 ## Production hardening roadmap
 
-- [ ] Pin GitHub Actions to reviewed full commit SHAs.
-- [ ] Use short-lived Azure authentication via OIDC, not long-lived client secrets.
-- [ ] Configure secured remote state, locking, access restrictions, and recovery.
-- [ ] Expand policies for network exposure, identity permissions, diagnostics, encryption, and approved regions.
-- [ ] Add time-bound exceptions with an owner, justification, ticket, and expiry.
-- [ ] Publish actionable structured findings and define artifact retention.
-- [ ] Test against representative Terraform plan JSON generated by the pinned Terraform version.
-- [ ] Review the threat model and applicable standards before making compliance claims.
+- [ ] Pin third-party Actions to reviewed immutable commit SHAs.
+- [ ] Expand policies for network exposure, identity, diagnostics, encryption and approved regions.
+- [ ] Add time-bound exceptions with an owner, ticket, justification and expiry.
+- [ ] Test representative Terraform plan JSON with pinned tool versions.
+- [ ] Protect branches and require the policy workflow as a status check.
+- [ ] Add OIDC and secured remote state only in a separate approved deployment workflow.
+- [ ] Define scanner severity thresholds and a documented exception process.
 
-## Interview-ready
+## Interview scenario
 
-**How would you stop insecure Terraform from reaching production?**
+**How would you stop an insecure Terraform change before production?**
 
-“I would add required checks to pull requests. Terraform validation catches configuration issues, Checkov detects common misconfigurations, and OPA/Conftest enforces organization-specific rules. I would add positive and negative tests, publish actionable findings, and use branch protection to require passing checks. Deployment remains a separate controlled stage with OIDC, secured state, and production approval.”
+Run format and validation checks, scan the IaC with Checkov, enforce organization-specific rules with OPA/Conftest, and test both compliant and deliberately non-compliant fixtures. Require these checks through branch protection. Keep deployment identity, remote state and production approval in a separate protected stage.
 
-**Why use Checkov and OPA together?**
+## Maintainer
 
-“Checkov provides a broad set of known IaC checks. OPA lets platform teams express organization-specific policy as version-controlled code. The tools complement each other and do not replace architecture review or runtime monitoring.”
+**MD Amirul Haque** · [GitHub](https://github.com/haqueamir70-coder) · [LinkedIn](https://www.linkedin.com/in/md-amirul-haque/)
 
-**Does green CI guarantee security?**
-
-“No. It means the configured checks passed for the inputs evaluated. Coverage, scanner versions, exceptions, architecture context, and runtime behavior still matter.”
-
-## Contributing
-
-Issues and pull requests are welcome. Add rationale and tests when proposing policies. See [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## License
-
-MIT. See [LICENSE](LICENSE).
-
----
-
-Built as a practical learning reference for Azure, Terraform, DevSecOps, and Policy as Code.
-
-
-## Architecture and interview preparation
-
-See the [architecture diagram and interview questions](docs/README.md) for the repository-specific design walkthrough and technical interview guide.
+<sub>Preventive controls are strongest when they are executable, tested and reviewable.</sub>
